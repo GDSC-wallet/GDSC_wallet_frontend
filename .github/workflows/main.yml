@@ -35,12 +35,13 @@ jobs:
       - name: Push to backend repo
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          PAT: ${{ secrets.PAT }}
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source-directory: 'dist'
-          destination-github-username: ${{ secrets.USERNAME }}
+          source-directory: dist
+          target-directory: output/
+          destination-github-username: 'GDSCWallet'
           destination-repository-name: 'GDSC_wallet_backend'
-          target-directory: 'dist'
           user-email: ${{ secrets.USER_EMAIL }}
+          commit-message: Auto Deploy
           target-branch: test
           
