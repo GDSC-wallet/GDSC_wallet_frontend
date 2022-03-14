@@ -43,5 +43,5 @@ jobs:
           destination-repository-name: 'GDSC_wallet_backend'
           user-email: ${{ secrets.USER_EMAIL }}
           commit-message: Auto Deploy
-          target-branch: test
+          target-branch: master
           
