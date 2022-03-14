@@ -1,15 +1,12 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Auto Deploy
 
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -24,7 +21,7 @@ jobs:
       - uses: actions/checkout@v2
       
       # Install NPM Packages
-      - name: Install NPM Packages
+      - name: Install npm packages
         run: npm install
         
       # Build for production
@@ -38,10 +35,10 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
           source-directory: dist
-          target-directory: output/
+          target-directory: dist/
           destination-github-username: 'GDSCWallet'
           destination-repository-name: 'GDSC_wallet_backend'
           user-email: ${{ secrets.USER_EMAIL }}
-          commit-message: Auto Deploy
+          commit-message: auto deploy to backend by Github Action
           target-branch: master
           
