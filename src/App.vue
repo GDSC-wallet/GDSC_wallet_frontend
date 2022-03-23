@@ -1,32 +1,52 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+    <v-app>
+        <v-main>
+            <v-container fluid>
+                <router-view></router-view>
+            </v-container>
+            <v-bottom-navigation app grow v-model="route">
+                <v-btn  value="Home" to="/">
+                    <span>Home</span>
+                    <v-icon>mdi-history</v-icon>
+                </v-btn>
+
+                <v-btn  value="Chart" to="/chart">
+                    <span>Chart</span>
+                    <v-icon>mdi-heart</v-icon>
+                </v-btn>
+                <v-btn  value="Setting" to="/setting">
+                    <span>Setting</span>
+                    <v-icon>mdi-map-marker</v-icon>
+                </v-btn>
+            </v-bottom-navigation>
+        </v-main>
+    </v-app>
 </template>
 
+<script>
+export default {
+    name: "App",
+    data() {
+        return {
+            route: "Home"
+        }
+    },
+    mounted() {
+
+    },
+    methods: {
+
+    },
+    computed: {
+
+    }
+}
+
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+.v-bottom-navigation--fixed {position: fixed !important;}
 
-#nav {
-  padding: 30px;
-}
+.v-item-group.v-bottom-navigation .v-btn {height: inherit !important;}
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>
