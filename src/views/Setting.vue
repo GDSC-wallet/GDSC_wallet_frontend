@@ -25,16 +25,16 @@
             Change Users' Name
           </v-card-title>
 
-          <input v-model="message" placeholder="Name"  />
+          <input type="label" v-model="message" placeholder="Name"  />
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
               color="primary"
               text
-              @click="dialog = false"
+              @click="dialog = false ; Count(message)"
             >
-              OK
+              Submit
             </v-btn>
             
             <v-btn
@@ -93,7 +93,7 @@
 <script>
 export default {
     name: "Setting",
-    data() {
+      data() {
         return {
             title: 'Setting',
             value: 1,
@@ -117,6 +117,9 @@ export default {
           default: return 'blue-grey'
         }
       },
+      Count(id){
+        return this.count;
+      }
     }
 }
 
