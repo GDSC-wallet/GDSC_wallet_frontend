@@ -1,5 +1,13 @@
 
+
+
+
 <template>
+
+
+
+  
+
   <v-expansion-panels
   v-model="panel"
   :disabled="disabled"
@@ -128,7 +136,17 @@
       </v-expansion-panel-content>
     </v-expansion-panel>
 
-   
+   <v-btn
+  class="mx-2"
+  fab
+  dark
+  color="indigo"
+  >
+  <v-icon dark>
+      mdi-plus
+  </v-icon>
+  </v-btn>
+
   </v-expansion-panels>
 </template>
     
