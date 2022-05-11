@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import Search from '../views/Search.vue'
 import Chart from '../views/Chart.vue'
-import Setting from '../views/Setting.vue'
+import Receipt from '../views/Receipt.vue'
 
 Vue.use(VueRouter)
 
@@ -13,14 +14,19 @@ const routes = [
         component: Home
     },
     {
+        path: '/search',
+        name: 'Search',
+        component: Search
+    },
+    {
         path: '/chart',
         name: 'Chart',
         component: Chart
     },
     {
-        path: '/setting',
-        name: 'Setting',
-        component: Setting
+        path: '/receipt',
+        name: 'Receipt',
+        component: Receipt
     },
 ]
 
