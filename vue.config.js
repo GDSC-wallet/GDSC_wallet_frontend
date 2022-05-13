@@ -3,13 +3,14 @@ module.exports = {
     'vuetify'
   ],
   devServer: {
+    port: "3000",
     proxy: {
       '^/api': {
-        target: 'http://localhost:3000',
+        target: 'https://wallet.ebg.tw',
         changeOrigin: true
       },
       '^/oauth': {
-        target: 'http://localhost:3000',
+        target: 'https://wallet.ebg.tw',
         changeOrigin: true
       },
     }
