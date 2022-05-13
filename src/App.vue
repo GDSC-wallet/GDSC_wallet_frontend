@@ -1,23 +1,25 @@
 <template>
   <v-app>
     <v-main>
-      <v-container fluid>
-        <router-view />
-      </v-container>
-      <v-bottom-navigation app grow v-model="route" v-if="isLoggedin">
-        <v-btn value="Home" to="/">
-          <span>Home</span>
-          <v-icon>mdi-history</v-icon>
-        </v-btn>
-        <v-btn value="Chart" to="/chart">
-          <span>Chart</span>
-          <v-icon>mdi-heart</v-icon>
-        </v-btn>
-        <v-btn value="Setting" to="/setting">
-          <span>Setting</span>
-          <v-icon>mdi-map-marker</v-icon>
-        </v-btn>
-      </v-bottom-navigation>
+      <template v-if="isReady">
+        <v-container fluid  style="height: 100%">
+          <router-view />
+        </v-container>
+        <v-bottom-navigation app grow v-model="route" v-if="isLoggedin">
+          <v-btn value="Home" to="/">
+            <span>Home</span>
+            <v-icon>mdi-history</v-icon>
+          </v-btn>
+          <v-btn value="Chart" to="/chart">
+            <span>Chart</span>
+            <v-icon>mdi-heart</v-icon>
+          </v-btn>
+          <v-btn value="Setting" to="/setting">
+            <span>Setting</span>
+            <v-icon>mdi-map-marker</v-icon>
+          </v-btn>
+        </v-bottom-navigation>
+      </template>
     </v-main>
   </v-app>
 </template>
@@ -34,9 +36,8 @@ export default {
   },
   mounted() {
     const authToken = localStorage.getItem("authToken");
-    if (authToken) {
-      this.login();
-    }
+    console.log(authToken)
+    this.login();
   },
   methods: {
     ...mapActions({
@@ -46,6 +47,7 @@ export default {
   computed: {
     ...mapGetters({
       isLoggedin: "auth/isLoggedin",
+      isReady: "auth/isReady",
     }),
   },
 };

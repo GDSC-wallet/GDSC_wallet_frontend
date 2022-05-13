@@ -1,24 +1,15 @@
 <template>
-    <p>this is Home</p>
+  <p>this is Home</p>
 </template>
 
 <script>
 export default {
-    name: "Home",
-    data() {
-        return {
-
-        }
-    },
-    mounted() {
-
-    },
-    methods: {
-
-    },
-    computed: {
-
-    }
-}
-
+  name: "Home",
+  data() {
+    return {};
+  },
+  mounted() {},
+  methods: {},
+  computed: {},
+};
 </script>

@@ -4,7 +4,8 @@ import Home from '../views/Home.vue'
 import Chart from '../views/Chart.vue'
 import Setting from '../views/Setting.vue'
 import Login from '../views/Login.vue'
-import Signup from '../views/Signup.vue'
+import CallbackSignup from '../views/Callback/Signup.vue'
+import CallbackLogin from '../views/Callback/Login.vue'
 
 import store from '@/store';
 
@@ -36,9 +37,15 @@ const routes = [
         meta: { requiresAuth: false }, // 不需驗證
     },
     {
-        path: '/signup',
-        name: 'Signup',
-        component: Signup,
+        path: '/callback/signup',
+        name: 'CallbackSignup',
+        component: CallbackSignup,
+        meta: { requiresAuth: false }, // 不需驗證
+    },
+    {
+        path: '/callback/login',
+        name: 'CallbackLogin',
+        component: CallbackLogin,
         meta: { requiresAuth: false }, // 不需驗證
     },
 ]
@@ -50,22 +57,14 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    // 如果 router 轉跳的頁面需要驗證 requiresAuth: true
-    console.log('to=', to.fullPath, '| from=', from.fullPath);
-    const isAuthenticated = store.getters['auth/isLoggedin']
-    if (to.matched.some(record => {
-        console.log(record.name, record.meta.requiresAuth);
-        return record.meta.requiresAuth;
-    })) {
-        // 如果沒有 token 
-        if (!isAuthenticated) {
-            // 轉跳到 login page
-            next({ path: '/login' });
-        } else {
-            next(); // 往下繼續執行
-        }
+    // console.log('to=', to.fullPath, '| from=', from.fullPath);
+    const isAuthenticated = store.getters['auth/isLoggedin'];
+    console.log(isAuthenticated)
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        //!isAuthenticated ? next({ path: '/login' }) : next();
+        next();
     } else {
-        next(); // 往下繼續執行
+        next();
     }
 });
 
