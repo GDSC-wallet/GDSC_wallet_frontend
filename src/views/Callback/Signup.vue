@@ -26,7 +26,7 @@ export default {
   mounted() {
     if(!this.$route.query.token) return this.$router.push({ path: '/login', replace: true });
     this.jwt = this.$route.query.token;
-    this.$router.replace("/signup");
+    this.$router.replace("/callback/signup");
   },
   methods: {
     ...mapActions({

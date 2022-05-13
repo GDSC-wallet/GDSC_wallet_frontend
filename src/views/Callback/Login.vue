@@ -12,7 +12,7 @@ export default {
   },
   mounted() {
     if (!this.$route.query.token)
-      return this.$router.push({ path: "/login", replace: true });
+      return this.$router.push({ path: "/callback/login", replace: true });
     else {
       localStorage.setItem("authToken", this.$route.query.token);
       this.login().then(() => {
