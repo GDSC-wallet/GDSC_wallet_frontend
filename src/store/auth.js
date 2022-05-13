@@ -27,19 +27,20 @@ const auth = {
         }
     },
     actions: {
-        login({ commit }) {
+        async login({ commit }) {
             commit("logout");
             commit("setProfile", null);
             commit("setAuthToken", localStorage.getItem("authToken"));
             ajax("/api/user/profile", "get").then(res => {
                 if (!res.data?.success) throw new Error(res.data);
-                commit("setProfile", res.data.data)
+                commit("setProfile", res.data.data);
+                commit("authenticateSuccess")
             }).catch((err) => {
                 console.log(err);
                 commit("logout");
             })
         },
-        signup({ commit, dispatch }, { jwt, nickname }) {
+        async signup({ commit, dispatch }, { jwt, nickname }) {
             localStorage.setItem("authToken", jwt);
             ajax("/api/user/signup", "post", { data: { nickname: nickname } }).then(res => {
                 if (!res.data?.success) throw new Error(res.data);
@@ -49,7 +50,7 @@ const auth = {
                 commit("logout");
             });
         },
-        logout({ commit }) {
+        async logout({ commit }) {
             localStorage.clear("authToken");
             commit("logout");
             /*
@@ -65,6 +66,12 @@ const auth = {
         },
         isReady(state) {
             return state.profile != null;
+        },
+        basicInformation(state) {
+            return {
+                nickname: state.profile?.nickname,
+                username: state.profile?.username
+            }
         }
     }
 }

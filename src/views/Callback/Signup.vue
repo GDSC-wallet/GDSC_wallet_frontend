@@ -16,7 +16,7 @@
 import { mapActions } from "vuex";
 
 export default {
-  name: "Signup",
+  name: "CallbackSignup",
   data() {
     return {
       jwt: "",

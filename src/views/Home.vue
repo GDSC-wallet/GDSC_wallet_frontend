@@ -1,8 +1,13 @@
 <template>
-  <p>this is Home</p>
+  <v-sheet>
+    <p>this is Home</p>
+    {{ basicInformation }}
+  </v-sheet>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   name: "Home",
   data() {
@@ -10,6 +15,10 @@ export default {
   },
   mounted() {},
   methods: {},
-  computed: {},
+  computed: {
+    ...mapGetters({
+      basicInformation: "auth/basicInformation",
+    }),
+  },
 };
 </script>

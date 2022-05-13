@@ -17,7 +17,9 @@ export default {
   data() {
     return {};
   },
-  mounted() {},
+  mounted() {
+    if (this.isLoggedin) return this.$router.push({ path: "/", replace: true });
+  },
   methods: {},
   computed: {
     ...mapGetters({

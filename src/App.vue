@@ -35,13 +35,11 @@ export default {
     };
   },
   mounted() {
-    const authToken = localStorage.getItem("authToken");
-    console.log(authToken)
     this.login();
   },
   methods: {
     ...mapActions({
-      login: "auth/login", // map `this.add()` to `this.$store.dispatch('increment')`
+      login: "auth/login",
     }),
   },
   computed: {
@@ -49,6 +47,12 @@ export default {
       isLoggedin: "auth/isLoggedin",
       isReady: "auth/isReady",
     }),
+  },
+  watch: {
+    isLoggedin() {
+      if (!this.isLoggedin)
+        return this.$router.push({ path: "/login", replace: true });
+    },
   },
 };
 </script>

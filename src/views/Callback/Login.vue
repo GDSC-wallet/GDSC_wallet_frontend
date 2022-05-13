@@ -6,11 +6,9 @@
 import { mapActions } from "vuex";
 
 export default {
-  name: "Signup",
+  name: "CallbackLogin",
   data() {
-    return {
-      jwt: "",
-    };
+    return {};
   },
   mounted() {
     if (!this.$route.query.token)
@@ -18,7 +16,7 @@ export default {
     else {
       localStorage.setItem("authToken", this.$route.query.token);
       this.login().then(() => {
-        return this.$router.replace("/");
+        this.$router.replace("/");
       });
     }
   },

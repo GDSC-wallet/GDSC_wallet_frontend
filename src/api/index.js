@@ -21,7 +21,6 @@ const ajax = (url, method, options) => {
   } else {
     params = data = null
   }
-  console.log(AUTH_TOKEN)
   return new Promise((resolve, reject) => {
     axios({ url, method, params, data, headers: { 'Authorization': AUTH_TOKEN } }).then(res => {
       resolve(res)
