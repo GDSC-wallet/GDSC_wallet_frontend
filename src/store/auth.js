@@ -27,13 +27,17 @@ const auth = {
         }
     },
     actions: {
-        async login({ commit }) {
+        login({ commit, dispatch }) {
             commit("logout");
             commit("setProfile", null);
             commit("setAuthToken", localStorage.getItem("authToken"));
+            dispatch("getProfile")
+        },
+        async getProfile({ commit }) {
             ajax("/api/user/profile", "get").then(res => {
                 if (!res.data?.success) throw new Error(res.data);
                 commit("setProfile", res.data.data);
+                commit("wallet/setWallet", res.data.data.wallets.find(wallet => wallet.wallet_id == res.data.data.selected_wallet_id), { root: true })
                 commit("authenticateSuccess")
             }).catch((err) => {
                 console.log(err);
@@ -72,6 +76,10 @@ const auth = {
                 nickname: state.profile?.nickname,
                 username: state.profile?.username
             }
+        },
+        getUserId(state) {
+            if(state.profile) return state.profile.user_id;
+            return "";
         }
     }
 }

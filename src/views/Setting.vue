@@ -1,12 +1,12 @@
 <template>
   <v-sheet>
-    <p>this is Setting</p>
+    <p>{{ basicInformation }}</p>
     <v-btn @click="logout">logout</v-btn>
   </v-sheet>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "Setting",
@@ -19,6 +19,10 @@ export default {
       logout: "auth/logout",
     }),
   },
-  computed: {},
+  computed: {
+    ...mapGetters({
+      basicInformation: "auth/basicInformation",
+    })
+  },
 };
 </script>
