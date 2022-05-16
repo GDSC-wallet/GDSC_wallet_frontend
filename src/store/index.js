@@ -1,18 +1,17 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import Donut from 'vue-css-donut-chart';
-import 'vue-css-donut-chart/dist/vcdonut.css';
-Vue.use(Donut);
+import auth from "./auth"
+import calendar from "./calendar"
+import wallet from "./wallet"
+import record from "./record"
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-    state: {
-    },
-    mutations: {
-    },
-    actions: {
-    },
     modules: {
+        auth: auth,
+        calendar: calendar,
+        wallet: wallet,
+        record: record
     }
 })
