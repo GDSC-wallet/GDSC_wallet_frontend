@@ -16,7 +16,7 @@ export default {
     else {
       localStorage.setItem("authToken", this.$route.query.token);
       this.login().then(() => {
-        this.$router.replace("/");
+        this.$router.replace("/login");
       });
     }
   },
