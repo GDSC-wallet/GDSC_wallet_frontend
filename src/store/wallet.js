@@ -35,6 +35,10 @@ const wallet = {
     getWalletId(state) {
       if (state.wallet) return state.wallet.wallet_id;
       return ""
+    },
+    getWalletTags(state) {
+      if (state.wallet) return state.wallet.tags;
+      return ""
     }
   }
 }

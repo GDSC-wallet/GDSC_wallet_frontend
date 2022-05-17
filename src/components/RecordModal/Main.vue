@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" max-width="290">
+  <v-dialog v-model="open" max-width="500">
     <v-card>
       <v-toolbar dark flat color="primary">
         <v-toolbar-title
@@ -107,7 +107,7 @@ export default {
         record_ordinary: 1,
         record_type: "income",
         record_updated_time: "",
-        wallet_record_tag_id: "tag_3be2eea8-1b6c-4809-9bb3-1c6df9a0caea",
+        wallet_record_tag_id: "tag_1b08e3cd-79b5-4918-a329-4771bad26765",
       },
       record_date_picker: false,
     };
@@ -176,7 +176,7 @@ export default {
             record_ordinary: 1,
             record_type: "income",
             record_updated_time: "",
-            wallet_record_tag_id: "tag_3be2eea8-1b6c-4809-9bb3-1c6df9a0caea",
+            wallet_record_tag_id: "tag_1b08e3cd-79b5-4918-a329-4771bad26765",
           };
         } else if (this.mode == "edit") {
           this.data = Object.assign({}, this.editData);
