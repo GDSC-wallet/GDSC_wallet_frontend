@@ -33,8 +33,13 @@ const auth = {
             commit("setAuthToken", localStorage.getItem("authToken"));
             dispatch("getProfile")
         },
-        async getProfile({ commit }) {
-            ajax("/api/user/profile", "get").then(res => {
+        async getProfile({ commit, rootGetters }) {
+            const date = rootGetters["calendar/getDate"];
+            ajax("/api/user/profile", "get", {
+                params: {
+                    time_choosen: new Date(date).toISOString().split("Z")[0]
+                }
+            }).then(res => {
                 if (!res.data?.success) throw new Error(res.data);
                 commit("setProfile", res.data.data);
                 commit("wallet/setWallet", res.data.data.wallets.find(wallet => wallet.wallet_id == res.data.data.selected_wallet_id), { root: true })

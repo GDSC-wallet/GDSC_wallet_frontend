@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" max-width="500">
+  <v-dialog v-model="open" max-width="500" scrollable>
     <v-card>
       <v-toolbar dark flat color="primary">
         <v-toolbar-title
@@ -12,12 +12,19 @@
           </v-tabs>
         </template>
       </v-toolbar>
-      <v-form @submit.prevent="sendRecord">
+      <v-form
+        @submit.prevent="sendRecord"
+        ref="form"
+        lazy-validation
+        v-model="valid"
+      >
         <v-card-text>
           <v-text-field
             label="標題"
             v-model="data.record_name"
             prepend-icon="mdi-format-title"
+            required
+            :rules="[(v) => (v && v.length > 0) || '請填入標題']"
           ></v-text-field>
           <v-menu
             ref="record_date_picker"
@@ -34,6 +41,8 @@
                 label="時間"
                 prepend-icon="mdi-calendar"
                 readonly
+                required
+                :rules="[(v) => (v && v.length > 0) || '請填入時間']"
                 v-bind="attrs"
                 v-on="on"
               ></v-text-field>
@@ -54,33 +63,69 @@
           </v-menu>
           <v-text-field
             label="金額"
-            v-model="data.record_amount"
+            v-model.number="data.record_amount"
             type="number"
             prepend-icon="mdi-currency-usd"
+            required
+            :rules="[(v) => (v && !isNaN(parseFloat(v))) || '請填入金額']"
           ></v-text-field>
-          <v-text-field
-            label="標籤(未完成)"
-            v-model="data.wallet_record_tag_id"
-            disabled
-            prepend-icon="mdi-tag"
-          ></v-text-field>
+          <v-dialog
+            ref="selectTagModal"
+            v-model="record_tag_selector"
+            :return-value.sync="data.wallet_record_tag_id"
+            scrollable
+            persistent
+            width="290px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                label="標籤"
+                v-model="selectedTagDisplay"
+                prepend-icon="mdi-tag"
+                readonly
+                required
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-card class="d-flex flex-column">
+              <v-card-title>選擇標籤</v-card-title>
+              <v-divider />
+              <v-list-item-group v-model="selectedTag" color="primary">
+                <v-list-item v-for="tag in walletTags" :key="tag.tag_id">
+                  <v-list-item-content>
+                    <v-list-item-title>{{ tag.tag_name }}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list-item-group>
+              <v-card-actions class="justify-end">
+                <v-btn
+                  color="primary"
+                  @click="$refs.selectTagModal.save(data.wallet_record_tag_id)"
+                >
+                  確定
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
           <v-text-field
             label="備註"
             v-model="data.record_description"
             prepend-icon="mdi-message-text"
           ></v-text-field>
         </v-card-text>
-        <v-card-actions style="justify-content: flex-end">
-          <v-btn
-            type="submit"
-            color="error"
-            @click="deleteRecord(data)"
-            v-if="mode == 'edit'"
-          >
-            刪除
-          </v-btn>
-          <v-btn type="submit" text color="primary">Submit</v-btn>
-        </v-card-actions>
+        <v-container>
+          <v-row>
+            <v-col>
+              <v-btn color="error" @click="deleteRecord(data)" block  v-if="mode == 'edit'">
+                刪除
+              </v-btn>
+            </v-col>
+            <v-col>
+              <v-btn type="submit" color="primary" block :disabled="!valid">Submit</v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-form>
     </v-card>
   </v-dialog>
@@ -107,9 +152,11 @@ export default {
         record_ordinary: 1,
         record_type: "income",
         record_updated_time: "",
-        wallet_record_tag_id: "tag_1b08e3cd-79b5-4918-a329-4771bad26765",
+        wallet_record_tag_id: "",
       },
+      valid: true,
       record_date_picker: false,
+      record_tag_selector: false,
     };
   },
   methods: {
@@ -121,19 +168,24 @@ export default {
       setData: "record/setData",
     }),
     sendRecord() {
-      console.log(this.mode)
-      if(this.mode == "create") {
+      if (!this.$refs.form.validate()) return;
+      if (this.mode == "create") {
         this.createRecord(this.data);
-      }else if(this.mode == "edit") {
+      } else if (this.mode == "edit") {
         this.editRecord(this.data);
       }
-    }
+    },
   },
   computed: {
     ...mapGetters({
       mode: "record/getMode",
       editData: "record/getData",
+      _walletTags: "wallet/getWalletTags",
+      calendarDate: "calendar/getDate"
     }),
+    walletTags() {
+      return this._walletTags(this.data.record_type);
+    },
     open: {
       get() {
         return this.$store.getters["record/getModal"];
@@ -150,6 +202,7 @@ export default {
         return 0;
       },
       set(value) {
+        this.data.wallet_record_tag_id = "";
         if (value == 0) {
           this.data.record_type = "income";
         } else if (value == 1) {
@@ -157,16 +210,35 @@ export default {
         }
       },
     },
+    selectedTag: {
+      get() {
+        return this.walletTags.indexOf(this.data.wallet_record_tag_id);
+      },
+      set(value) {
+        this.data.wallet_record_tag_id = this.walletTags[value]?.tag_id
+          ? this.walletTags[value].tag_id
+          : "";
+      },
+    },
+    selectedTagDisplay: {
+      get() {
+        return this.walletTags.find(
+          (tag) => tag.tag_id == this.data.wallet_record_tag_id
+        )?.tag_name;
+      },
+      set() {},
+    },
   },
   watch: {
     open(newVal) {
       if (newVal == true) {
+        if(this.$refs.form) this.$refs.form.resetValidation()
         if (this.mode == "create") {
           this.data = {
             record_amount: null,
             record_created_time: "",
             record_date: new Date(
-              Date.now() - new Date().getTimezoneOffset() * 60000
+              this.calendarDate - this.calendarDate.getTimezoneOffset() * 60000
             )
               .toISOString()
               .split("T")[0],
@@ -176,14 +248,16 @@ export default {
             record_ordinary: 1,
             record_type: "income",
             record_updated_time: "",
-            wallet_record_tag_id: "tag_1b08e3cd-79b5-4918-a329-4771bad26765",
+            wallet_record_tag_id: "",
           };
         } else if (this.mode == "edit") {
           this.data = Object.assign({}, this.editData);
           this.data.record_date = new Date(
             new Date(this.data.record_date) -
               new Date(this.data.record_date).getTimezoneOffset() * 60000
-          ).toISOString().split("T")[0];
+          )
+            .toISOString()
+            .split("T")[0];
         }
       } else {
         this.setData(new Object());
