@@ -1,51 +1,75 @@
 <template>
   <v-app>
-    <v-main>
-      <template v-if="isReady">
-        <v-container fluid style="height: 100%">
-          <router-view />
-        </v-container>
-        <v-bottom-navigation app grow fixed v-model="route" v-if="isLoggedin">
-          <v-btn value="Home" to="/">
-            <span>Home</span>
-            <v-icon>mdi-history</v-icon>
-          </v-btn>
-          <v-btn value="Chart" to="/chart">
-            <span>Table</span>
-            <v-icon>mdi-table</v-icon>
-          </v-btn>
-          <v-btn depressed @click="openRecordModal">
-            <span>New</span>
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
-          <v-btn value="Chart" to="/chart">
-            <span>Chart</span>
-            <v-icon>mdi-chart-pie</v-icon>
-          </v-btn>
-          <v-btn value="Setting" to="/setting">
-            <span>Setting</span>
-            <v-icon>mdi-cog</v-icon>
-          </v-btn>
-        </v-bottom-navigation>
-        <RecordModal />
-      </template>
+    <template v-if="isLoggedin">
+      <v-app-bar color="deep-purple accent-4" dark app :hide-on-scroll="false">
+        <v-app-bar-nav-icon @click="drawer = true" />
+        <v-spacer />
+        <v-btn icon>
+          <v-icon>mdi-barcode-scan</v-icon>
+        </v-btn>
+        <v-btn icon>
+          <v-icon>mdi-chart-arc</v-icon>
+        </v-btn>
+      </v-app-bar>
+      <v-navigation-drawer v-model="drawer" app>
+        <template v-slot:prepend>
+          <v-list-item>
+            <v-list-item-content>
+              <v-list-item-title class="text-h6">
+                {{ basicInformation.nickname }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                {{ basicInformation.username }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+          <v-divider></v-divider>
+        </template>
+        <Wallets />
+        <template v-slot:append>
+          <div class="pa-4">
+            <v-btn block class="my-2" to="/setting"> Setting </v-btn>
+            <v-btn block color="error" class="my-2"> Logout </v-btn>
+          </div>
+        </template>
+      </v-navigation-drawer>
+    </template>
+    <v-main v-if="isReady">
+      <v-container fluid>
+        <router-view />
+      </v-container>
+      <RecordModal />
+      <v-btn
+        v-if="isLoggedin"
+        color="primary"
+        bottom
+        right
+        fab
+        fixed
+        @click="openRecordModal"
+      >
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
     </v-main>
   </v-app>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import RecordModal from "./components/RecordModal/Main.vue"
+import Wallets from "./components/Wallet/Main.vue";
+import RecordModal from "./components/RecordModal/Main.vue";
 
 export default {
   name: "App",
   data() {
     return {
       route: "Home",
+      drawer: false,
     };
   },
   components: {
-    RecordModal: RecordModal
+    RecordModal: RecordModal,
+    Wallets: Wallets,
   },
   mounted() {
     this.login();
@@ -58,13 +82,15 @@ export default {
     }),
     openRecordModal() {
       this.openModal();
-      this.switchCreateMode()
-    }
+      this.switchCreateMode();
+    },
   },
   computed: {
     ...mapGetters({
       isLoggedin: "auth/isLoggedin",
       isReady: "auth/isReady",
+      basicInformation: "auth/basicInformation",
+      walletDetail: "wallet/getWalletDetail",
     }),
   },
   watch: {
