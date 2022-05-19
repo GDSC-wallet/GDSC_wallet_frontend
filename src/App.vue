@@ -29,13 +29,13 @@
         <template v-slot:append>
           <div class="pa-4">
             <v-btn block class="my-2" to="/setting"> Setting </v-btn>
-            <v-btn block color="error" class="my-2"> Logout </v-btn>
+            <v-btn block color="error" class="my-2" @click="logout"> Logout </v-btn>
           </div>
         </template>
       </v-navigation-drawer>
     </template>
     <v-main v-if="isReady">
-      <v-container fluid>
+      <v-container style="height: 100%" fluid>
         <router-view />
       </v-container>
       <RecordModal />
@@ -77,6 +77,7 @@ export default {
   methods: {
     ...mapActions({
       login: "auth/login",
+      logout: "auth/logout",
       openModal: "record/openModal",
       switchCreateMode: "record/createMode",
     }),
