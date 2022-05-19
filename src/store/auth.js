@@ -85,6 +85,19 @@ const auth = {
         getUserId(state) {
             if(state.profile) return state.profile.user_id;
             return "";
+        },
+        getWallets(state) {
+            if(state.profile) return state.profile.wallets.sort((a, b) => b.selected - a.selected).map(wallet => {
+                return {
+                    wallet_id: wallet.wallet_id,
+                    wallet_total: wallet.wallet_total,
+                    wallet_name: wallet.wallet_name,
+                    wallet_title: wallet.wallet_title,
+                    wallet_description: wallet.wallet_description,
+                    selected: wallet.selected ? true : false
+                }
+            });
+            return [];
         }
     }
 }

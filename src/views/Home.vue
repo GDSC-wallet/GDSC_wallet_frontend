@@ -1,4 +1,3 @@
-
 <template>
   <v-sheet>
     <Calendar class="pa-1" />
@@ -10,7 +9,10 @@
         <v-expansion-panel-header>
           {{ record.record_name }}
           <template v-slot:actions>
-            <span>{{record.record_type == "expense" ? "-" : ""}}{{ record.record_amount }}</span>
+            <span
+              >{{ record.record_type == "expense" ? "-" : ""
+              }}{{ record.record_amount }}</span
+            >
           </template>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
@@ -21,10 +23,14 @@
           </ul>
           <v-row>
             <v-col>
-              <v-btn color="primary" @click="openRecordModal(record)" block>修改</v-btn>
+              <v-btn color="primary" @click="openRecordModal(record)" block
+                >修改</v-btn
+              >
             </v-col>
             <v-col>
-              <v-btn color="error" @click="deleteRecord(record)" block>刪除</v-btn>
+              <v-btn color="error" @click="deleteRecord(record)" block
+                >刪除</v-btn
+              >
             </v-col>
           </v-row>
         </v-expansion-panel-content>

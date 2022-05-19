@@ -25,7 +25,41 @@ const wallet = {
       }).catch((err) => {
         console.log(err);
       })
-    }
+    },
+    async createWallet({ dispatch }, data) {
+      ajax("/api/wallet/create", "post", {
+        data: {
+          ...data
+        }
+      }).then(() => {
+        dispatch("auth/getProfile", null, { root: true })
+      }).catch((err) => {
+        console.log(err);
+      })
+    },
+    async deleteWallet({ getters, dispatch }) {
+      ajax("/api/wallet/delete", "post", {
+        data: {
+          wallet_id: getters.getWalletId
+        }
+      }).then(() => {
+        dispatch("auth/getProfile", null, { root: true })
+      }).catch((err) => {
+        console.log(err);
+      })
+    },
+    async switchWallet({ rootGetters, dispatch }, wallet_id) {
+      ajax("/api/wallet", "get", {
+        params: {
+          wallet_id: wallet_id,
+          time_choosen: rootGetters["calendar/getDate"].toISOString().split('Z')[0]
+        }
+      }).then(() => {
+        dispatch("auth/getProfile", null, { root: true })
+      }).catch((err) => {
+        console.log(err);
+      })
+    },
   },
   getters: {
     getRecords(state) {
@@ -37,9 +71,6 @@ const wallet = {
       return ""
     },
     getWalletTags: (state) => (mode) => {
-      // transform english to chinese
-      if(mode == "income") mode = "收入";
-      if(mode == "expense") mode = "支出";
       if (state.wallet) return state.wallet.tags.filter(tag => tag.tag_type == mode);
       return []
     }

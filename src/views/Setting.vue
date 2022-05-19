@@ -1,46 +1,30 @@
 <template>
   <v-sheet>
-    <v-card>
+    <v-toolbar flat class="mb-3">
+        <v-btn icon to="/">
+          <v-icon>mdi-home</v-icon>
+        </v-btn>
+        <v-toolbar-title>設定</v-toolbar-title>
+      </v-toolbar>
+    <v-card class="mx-1">
       <v-card-title>{{ basicInformation.nickname }}</v-card-title>
       <v-card-subtitle>{{ basicInformation.username }}</v-card-subtitle>
-      <v-container>
-        <v-row>
-          <v-col>
-            <v-btn @click="handleDialogChange(true)" block>Edit Tag</v-btn>
-          </v-col>
-          <v-col>
-            <v-btn @click="logout" color="error" block>logout</v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
     </v-card>
-    <TagModal :open="tagDialogOpen" @handleChange="handleDialogChange" />
   </v-sheet>
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
-import TagModal from "../components/TagModal/Main.vue"
+import { mapGetters } from "vuex";
 
 export default {
   name: "Setting",
   data() {
     return {
-      tagDialogOpen: false
+      tagDialogOpen: false,
     };
   },
-  components: {
-    TagModal: TagModal,
-  },
   mounted() {},
-  methods: {
-    ...mapActions({
-      logout: "auth/logout",
-    }),
-    handleDialogChange(value) {
-      this.tagDialogOpen = value;
-    }
-  },
+  methods: {},
   computed: {
     ...mapGetters({
       basicInformation: "auth/basicInformation",
