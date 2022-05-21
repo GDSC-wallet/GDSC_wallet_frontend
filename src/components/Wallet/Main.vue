@@ -8,11 +8,16 @@
         <v-list-item-content>
           <v-list-item-title v-if="wallet.selected">目前錢包</v-list-item-title>
           <v-list-item-title class="text-h6 d-flex justify-space-between">
-            <span>{{ wallet.wallet_title }}</span>
+            <span>{{ wallet.wallet_name }}</span>
             <span v-if="wallet.selected">${{ wallet.wallet_total }}</span>
           </v-list-item-title>
-          <v-list-item-subtitle v-if="wallet.selected">
-            {{ wallet.wallet_description }}
+          <v-list-item-subtitle v-if="wallet.selected" class="text-h6 d-flex justify-space-between">
+            <span>{{ wallet.wallet_name }}</span>
+            <span>
+              <v-btn x-small icon color="error" @click="deleteWallet(wallet.wallet_id)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </span>
           </v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action v-if="!wallet.selected">
