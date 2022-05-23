@@ -1,12 +1,11 @@
 <template>
   <div class="text-center">
     <v-dialog v-model="dialog" width="500">
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn block color="primary" v-bind="attrs" v-on="on">新增錢包</v-btn>
-      </template>
       <v-card style="overflow: hidden" class="d-flex flex-column">
         <v-toolbar dark flat color="primary">
-          <v-toolbar-title>{{ mode == "edit" ? "新增" : "修改"}}錢包</v-toolbar-title>
+          <v-toolbar-title
+            >{{ mode == "edit" ? "修改" : "新增" }}錢包</v-toolbar-title
+          >
         </v-toolbar>
         <v-form
           @submit.prevent="handleSubmit"
@@ -31,9 +30,9 @@
           <v-card-actions>
             <v-row justify="end">
               <v-col cols="6">
-                <v-btn type="submit" color="primary" block :disabled="!valid"
-                  >新增</v-btn
-                >
+                <v-btn type="submit" color="primary" block :disabled="!valid">
+                  {{ mode == "edit" ? "修改" : "新增" }}
+                </v-btn>
               </v-col>
             </v-row>
           </v-card-actions>
@@ -48,13 +47,14 @@ import { mapActions } from "vuex";
 
 export default {
   props: {
+    open: Boolean,
     mode: String,
-    editingWallet: Object
+    editingWallet: Object,
   },
+  name: "WalletModal",
   data() {
     return {
       valid: true,
-      dialog: false,
       data: {
         wallet_name: "",
         wallet_description: "",
@@ -65,28 +65,47 @@ export default {
   methods: {
     ...mapActions({
       createWallet: "wallet/createWallet",
+      editWallet: "wallet/editWallet",
     }),
     handleSubmit() {
-      if (!this.valid) return;
-      this.createWallet(this.data).then(() => {
-        this.dialog = false;
-      });
+      if (!this.$refs.form.validate()) return;
+      if (this.mode == "create") {
+        this.createWallet(this.data).then(() => {
+          this.dialog = false;
+        });
+      } else if (this.mode == "edit") {
+        this.editWallet(this.data).then(() => {
+          this.dialog = false;
+        });
+      }
+    },
+  },
+  computed: {
+    dialog: {
+      get() {
+        return this.open;
+      },
+      set(value) {
+        this.$emit("handleDialogChange", value);
+      },
     },
   },
   watch: {
-    dialog() {
+    dialog(newval) {
       if (this.$refs.form) this.$refs.form.resetValidation();
-      if (this.mode == "create") {
-        this.data = {
-          wallet_name: "",
-          wallet_description: "",
-          wallet_id: "",
-        };
-      } else if(this.mode == "edit") {
-        this.data = {
-          wallet_name: this.editingWallet.wallet_name,
-          wallet_description: this.editingWallet.wallet_description,
-          wallet_id: this.editingWallet.wallet_id
+      if (newval == true) {
+        if (this.mode == "create") {
+          this.data = {
+            wallet_name: "",
+            wallet_description: "",
+            wallet_id: "",
+          };
+        } else if (this.mode == "edit") {
+          this.data = {
+            wallet_name: this.editingWallet.wallet_name,
+            wallet_description: this.editingWallet.wallet_description,
+            wallet_id: this.editingWallet.wallet_id,
+          };
         }
       }
     },

@@ -29,7 +29,21 @@ const wallet = {
     async createWallet({ dispatch }, data) {
       ajax("/api/wallet/create", "post", {
         data: {
-          ...data
+          wallet_name: data?.wallet_name,
+          wallet_description: data?.wallet_descriptions
+        }
+      }).then(() => {
+        dispatch("auth/getProfile", null, { root: true })
+      }).catch((err) => {
+        console.log(err);
+      })
+    },
+    async editWallet({ dispatch }, data) {
+      ajax("/api/wallet/edit", "post", {
+        data: {
+          wallet_name: data?.wallet_name,
+          wallet_description: data?.wallet_description,
+          wallet_id: data?.wallet_id
         }
       }).then(() => {
         dispatch("auth/getProfile", null, { root: true })
@@ -69,6 +83,15 @@ const wallet = {
     getWalletId(state) {
       if (state.wallet) return state.wallet.wallet_id;
       return ""
+    },
+    getWalletInfo(state) {
+      if (state.wallet) return {
+        wallet_id: state.wallet.wallet_id,
+        wallet_total: state.wallet.wallet_total,
+        wallet_name: state.wallet.wallet_name,
+        wallet_description: state.wallet.wallet_description,
+      };
+      return {}
     },
     getWalletTags: (state) => (mode) => {
       if (state.wallet) return state.wallet.tags.filter(tag => tag.tag_type == mode);

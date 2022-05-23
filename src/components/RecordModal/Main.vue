@@ -91,7 +91,7 @@
             <v-card class="d-flex flex-column">
               <v-card-title>選擇標籤</v-card-title>
               <v-divider />
-              <v-list-item-group v-model="selectedTag" color="primary">
+              <v-list-item-group v-model="selectedTag" color="primary" mandatory>
                 <v-list-item v-for="tag in walletTags" :key="tag.tag_id">
                   <v-list-item-content>
                     <v-list-item-title>{{ tag.tag_name }}</v-list-item-title>
@@ -230,6 +230,9 @@ export default {
     },
   },
   watch: {
+    "data.record_type"() {
+      this.data.wallet_record_tag_id = this.walletTags[0]?.tag_id
+    },
     open(newVal) {
       if (newVal == true) {
         if(this.$refs.form) this.$refs.form.resetValidation()
@@ -248,7 +251,7 @@ export default {
             record_ordinary: 1,
             record_type: "income",
             record_updated_time: "",
-            wallet_record_tag_id: "",
+            wallet_record_tag_id: this.walletTags[0]?.tag_id,
           };
         } else if (this.mode == "edit") {
           this.data = Object.assign({}, this.editData);
