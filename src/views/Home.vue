@@ -7,20 +7,26 @@
         :key="record.record_id"
       >
         <v-expansion-panel-header>
-          {{ record.record_name }}
-          <template v-slot:actions>
-            <span
-              >{{ record.record_type == "expense" ? "-" : ""
-              }}{{ record.record_amount }}</span
+          <div class="d-flex align-center">
+            <v-chip
+              :color="tag(record.wallet_record_tag_id).tag_color"
+              :text-color="contrastText(tag(record.wallet_record_tag_id).tag_color)"
+              label
+              small
+              class="ma-2"
             >
+              {{ tag(record.wallet_record_tag_id).tag_name }}
+            </v-chip>
+            <span>{{ record.record_name }}</span>
+          </div>
+          <template v-slot:actions>
+            <span>
+              {{ record.record_amount }}
+            </span>
           </template>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <ul class="pb-3">
-            <li v-for="attr in Object.keys(record)" :key="attr">
-              {{ attr }}: {{ record[attr] }}
-            </li>
-          </ul>
+          <p>{{record.record_description}}</p>
           <v-row>
             <v-col>
               <v-btn color="primary" @click="openRecordModal(record)" block
@@ -64,11 +70,22 @@ export default {
       this.switchEditMode();
       this.setData(record);
     },
+    contrastText(color) {
+      let hex = color.charAt(0) === "#" ? color.substring(1, 7) : color;
+      let r = parseInt(hex.slice(0, 2), 16),
+        g = parseInt(hex.slice(2, 4), 16),
+        b = parseInt(hex.slice(4, 6), 16);
+      return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? "black" : "white";
+    },
+    tag(id) {
+      return this.getAllWalletTags.find((tag) => tag.tag_id == id);
+    },
   },
   computed: {
     ...mapGetters({
       currentDate: "calendar/getDate",
       records: "wallet/getRecords",
+      getAllWalletTags: "wallet/getAllWalletTags",
     }),
     getTodaysRecords() {
       return this.records.filter((record) => {

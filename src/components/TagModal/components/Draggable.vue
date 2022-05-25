@@ -9,19 +9,32 @@
     @end="drag = false"
   >
     <transition-group type="transition" :name="!drag ? 'flip-list' : null">
-      <v-sheet class="list-group-item pa-1" v-for="tag in renderList" :key="tag.tag_id">
+      <v-sheet
+        class="list-group-item pa-1"
+        v-for="tag in renderList"
+        :key="tag.tag_id"
+      >
         <v-card>
-          <v-card-title class="d-flex justify-space-between align-content-center">
+          <v-card-title
+            class="d-flex justify-space-between align-content-center"
+          >
             <span>
               <v-icon class="handle">mdi-drag</v-icon>
-              {{ tag.tag_name }}
+              <v-chip
+                :color="tag.tag_color"
+                :text-color="contrastText(tag.tag_color)"
+                label
+                small
+                class="mx-2"
+              >
+                {{ tag.tag_name }}
+              </v-chip>
             </span>
             <span>
-              <v-icon :color="tag.tag_color" class="px-2">mdi-circle</v-icon>
-              <v-btn icon >
-                <v-icon>mdi-pencil</v-icon>
+              <v-btn icon>
+                <v-icon @click="editTag(tag)">mdi-pencil</v-icon>
               </v-btn>
-              <v-btn icon color="error" @click="deleteTag(tag)">
+              <v-btn icon color="error" @click="deleteTag(tag.tag_id)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </span>
@@ -34,11 +47,12 @@
 
 <script>
 import draggable from "vuedraggable";
+import { mapActions } from "vuex";
 
 export default {
   name: "transition-example-2",
   props: {
-    list: Array
+    list: Array,
   },
   data() {
     return {
@@ -55,19 +69,29 @@ export default {
     draggable,
   },
   methods: {
-    deleteTag(tag) {
-      this.renderList = this.renderList.filter(listTag => listTag.tag_id != tag.tag_id)
+    ...mapActions({
+      deleteTag: "wallet/deleteTag",
+    }),
+    contrastText(color) {
+      let hex = color.charAt(0) === "#" ? color.substring(1, 7) : color;
+      let r = parseInt(hex.slice(0, 2), 16),
+        g = parseInt(hex.slice(2, 4), 16),
+        b = parseInt(hex.slice(4, 6), 16);
+      return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? "black" : "white";
+    },
+    editTag(tag) {
+      this.$emit("handleeditTag", tag);
     }
   },
   computed: {
     renderList: {
       get() {
-        return this.list
+        return this.list;
       },
       set(value) {
-        this.$emit("handleChange", value)
-      }
-    }
+        this.$emit("handleChange", value);
+      },
+    },
   },
 };
 </script>

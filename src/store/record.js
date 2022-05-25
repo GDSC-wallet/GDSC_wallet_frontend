@@ -42,7 +42,7 @@ const record = {
           record_ordinary: 1,
           record_name: record?.record_name,
           record_description: record?.record_description,
-          record_amount: record?.record_amount,
+          record_amount: (record?.record_type == "expense" ? -1 : 1) * record?.record_amount,
           record_type: record?.record_type,
           record_date: new Date(record?.record_date).toISOString().split("Z")[0],
         }

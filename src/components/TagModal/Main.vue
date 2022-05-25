@@ -13,32 +13,46 @@
       <v-container class="flex-grow-1" style="overflow: auto">
         <v-tabs-items v-model="tab" touchless>
           <v-tab-item>
-            <DraggableTag :list="incomeList" @handleChange="handleIncomeChange" />
+            <DraggableTag
+              :list="incomeList"
+              @handleChange="handleIncomeChange"
+              @handleeditTag="editTag"
+            />
           </v-tab-item>
           <v-tab-item>
-            <DraggableTag :list="expenseList" @handleChange="handleExpenseChange" />
+            <DraggableTag
+              :list="expenseList"
+              @handleChange="handleExpenseChange"
+              @handleeditTag="editTag"
+            />
           </v-tab-item>
         </v-tabs-items>
       </v-container>
       <v-card-actions>
         <v-row>
           <v-col>
-            <v-btn color="success" block @click="handleDialogChange(true)">新增標籤</v-btn>
+            <v-btn color="success" block @click="createTag">新增標籤</v-btn>
           </v-col>
           <v-col>
-            <v-btn color="primary" block @click="updateTag">儲存</v-btn>
+            <v-btn color="primary" block @click="updateTag">儲存順序</v-btn>
           </v-col>
         </v-row>
       </v-card-actions>
     </v-card>
-    <CreateModal :open="createModalOpen" @handleChange="handleDialogChange" />
+    <TagModal
+      :open="tagModalOpen"
+      @handleChange="handleDialogChange"
+      :mode="mode"
+      :type="type"
+      :editData="editTagData"
+    />
   </v-dialog>
 </template>
 
 <script>
 import DraggableTag from "./components/Draggable.vue";
-import CreateModal from "./components/CreateModal.vue"
-import { mapGetters } from "vuex";
+import TagModal from "./components/TagModal.vue";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "RecordDialog",
@@ -50,20 +64,29 @@ export default {
       incomeList: [],
       expenseList: [],
       type: "income",
-      createModalOpen: false
+      tagModalOpen: false,
+      editTagData: null,
+      mode: "create",
     };
   },
   components: {
     DraggableTag: DraggableTag,
-    CreateModal: CreateModal
+    TagModal: TagModal,
   },
   mounted() {
     this.initialize();
   },
   methods: {
+    ...mapActions({
+      updateAllTags: "wallet/updateAllTags"
+    }),
     initialize() {
-      this.incomeList = this.tags("income").map((tag) => Object.assign({}, tag));
-      this.expenseList = this.tags("expense").map((tag) => Object.assign({}, tag));
+      this.incomeList = this.tags("income").map((tag) =>
+        Object.assign({}, tag)
+      );
+      this.expenseList = this.tags("expense").map((tag) =>
+        Object.assign({}, tag)
+      );
     },
     handleIncomeChange(value) {
       this.incomeList = value;
@@ -72,11 +95,22 @@ export default {
       this.expenseList = value;
     },
     handleDialogChange(value) {
-      this.createModalOpen = value
+      this.tagModalOpen = value;
     },
     updateTag() {
-      console.log(this.tagList)
-    }
+      this.updateAllTags(this.tagList).then(() => {
+        this.dialogOpen = false
+      })
+    },
+    createTag() {
+      this.handleDialogChange(true);
+      this.mode = "create";
+    },
+    editTag(tag) {
+      this.handleDialogChange(true);
+      this.mode = "edit";
+      this.editTagData = tag;
+    },
   },
   computed: {
     ...mapGetters({
@@ -107,8 +141,13 @@ export default {
       },
     },
     tagList() {
-      return this.expenseList.concat(this.incomeList);
-    }
+      return this.expenseList.concat(this.incomeList).map((tag, i) => {
+        return {
+          ...tag,
+          tag_ordinary: i + 1,
+        };
+      });
+    },
   },
 };
 </script>

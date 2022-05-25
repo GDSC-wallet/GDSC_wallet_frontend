@@ -69,45 +69,35 @@
             required
             :rules="[(v) => (v && !isNaN(parseFloat(v))) || '請填入金額']"
           ></v-text-field>
-          <v-dialog
-            ref="selectTagModal"
-            v-model="record_tag_selector"
-            :return-value.sync="data.wallet_record_tag_id"
-            scrollable
-            persistent
-            width="290px"
+          <v-select
+            :items="walletTags"
+            v-model="selectedTag"
+            label="標籤"
+            prepend-icon="mdi-tag"
           >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                label="標籤"
-                v-model="selectedTagDisplay"
-                prepend-icon="mdi-tag"
-                readonly
-                required
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
+            <template v-slot:selection="{ item }">
+              <v-chip
+                :color="item.value.tag_color"
+                :text-color="contrastText(item.value.tag_color)"
+                label
+                small
+                class="ma-2"
+              >
+                {{ item.text }}
+              </v-chip>
             </template>
-            <v-card class="d-flex flex-column">
-              <v-card-title>選擇標籤</v-card-title>
-              <v-divider />
-              <v-list-item-group v-model="selectedTag" color="primary" mandatory>
-                <v-list-item v-for="tag in walletTags" :key="tag.tag_id">
-                  <v-list-item-content>
-                    <v-list-item-title>{{ tag.tag_name }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list-item-group>
-              <v-card-actions class="justify-end">
-                <v-btn
-                  color="primary"
-                  @click="$refs.selectTagModal.save(data.wallet_record_tag_id)"
-                >
-                  確定
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+            <template v-slot:item="{ item }">
+              <v-chip
+                :color="item.value.tag_color"
+                :text-color="contrastText(item.value.tag_color)"
+                label
+                small
+                class="mx-2"
+              >
+                {{ item.text }}
+              </v-chip>
+            </template>
+          </v-select>
           <v-text-field
             label="備註"
             v-model="data.record_description"
@@ -117,12 +107,19 @@
         <v-container>
           <v-row>
             <v-col>
-              <v-btn color="error" @click="deleteRecord(data)" block  v-if="mode == 'edit'">
+              <v-btn
+                color="error"
+                @click="deleteRecord(data)"
+                block
+                v-if="mode == 'edit'"
+              >
                 刪除
               </v-btn>
             </v-col>
             <v-col>
-              <v-btn type="submit" color="primary" block :disabled="!valid">Submit</v-btn>
+              <v-btn type="submit" color="primary" block :disabled="!valid"
+                >Submit</v-btn
+              >
             </v-col>
           </v-row>
         </v-container>
@@ -175,16 +172,28 @@ export default {
         this.editRecord(this.data);
       }
     },
+    contrastText(color) {
+      let hex = color.charAt(0) === "#" ? color.substring(1, 7) : color;
+      let r = parseInt(hex.slice(0, 2), 16),
+        g = parseInt(hex.slice(2, 4), 16),
+        b = parseInt(hex.slice(4, 6), 16);
+      return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? "black" : "white";
+    },
   },
   computed: {
     ...mapGetters({
       mode: "record/getMode",
       editData: "record/getData",
       _walletTags: "wallet/getWalletTags",
-      calendarDate: "calendar/getDate"
+      calendarDate: "calendar/getDate",
     }),
     walletTags() {
-      return this._walletTags(this.data.record_type);
+      return this._walletTags(this.data.record_type).map((tag) => {
+        return {
+          text: tag.tag_name,
+          value: tag,
+        };
+      });
     },
     open: {
       get() {
@@ -212,30 +221,22 @@ export default {
     },
     selectedTag: {
       get() {
-        return this.walletTags.indexOf(this.data.wallet_record_tag_id);
+        return this.walletTags.find(
+          (tag) => tag.value.tag_id == this.data.wallet_record_tag_id
+        )?.value;
       },
       set(value) {
-        this.data.wallet_record_tag_id = this.walletTags[value]?.tag_id
-          ? this.walletTags[value].tag_id
-          : "";
+        this.data.wallet_record_tag_id = value.tag_id;
       },
-    },
-    selectedTagDisplay: {
-      get() {
-        return this.walletTags.find(
-          (tag) => tag.tag_id == this.data.wallet_record_tag_id
-        )?.tag_name;
-      },
-      set() {},
     },
   },
   watch: {
     "data.record_type"() {
-      this.data.wallet_record_tag_id = this.walletTags[0]?.tag_id
+      this.data.wallet_record_tag_id = this.walletTags[0]?.value.tag_id;
     },
     open(newVal) {
       if (newVal == true) {
-        if(this.$refs.form) this.$refs.form.resetValidation()
+        if (this.$refs.form) this.$refs.form.resetValidation();
         if (this.mode == "create") {
           this.data = {
             record_amount: null,
@@ -251,7 +252,7 @@ export default {
             record_ordinary: 1,
             record_type: "income",
             record_updated_time: "",
-            wallet_record_tag_id: this.walletTags[0]?.tag_id,
+            wallet_record_tag_id: this.walletTags[0]?.value.tag_id,
           };
         } else if (this.mode == "edit") {
           this.data = Object.assign({}, this.editData);
